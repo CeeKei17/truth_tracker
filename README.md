@@ -13,7 +13,7 @@ This introduces critical vulnerabilities:
 
 The **Truth Tracker** eliminates these risks by applying an asymmetric Public Key Infrastructure (PKI) model to verify that documents are genuinely authentic and remain completely unaltered from the exact moment they were signed.
 
----
+
 
 ## 2. Cryptographic Architecture
 
@@ -25,64 +25,30 @@ The application relies on strong, industry-standard cryptographic primitives dec
 
 ### System Workflow Block Diagram
 
-========================================================================================
 PHASE A: SIGNING WORKFLOW
-========================================================================================
+[ Document ] ──(4KB Blocks)──> [ SHA-256 Engine ] ──> [ 32-Byte Hash ]
+                                                            │
+  ┌─────────────────────────────────────────────────────────┘
+  ▼
+[ RSA-PSS Padding ] ──(+ Randomized Salt)──> [ RSA Encryption ]
+                                                    ▲
+                                                    │
+                                      [ 4096-bit Private Key ]
+                                                    │
+                                                    ▼
+                                      [ 512-Byte Detached Signature ]
+                                      (Saved as 'contract.txt.sig')
 
-[ Administrative Document ] ──> Reads bytes in 4KB blocks
-│
-▼
-┌───────────────────────────────┐
-│ SHA-256 Hashing Engine │ ──> Mathematical One-Way Compression
-└───────────────────────────────┘
-│
-▼
-[ 32-Byte Hash Digest ]
-│
-▼
-┌───────────────────────────────┐ ┌────────────────────────────────┐
-│ RSA-PSS Padding Layer │ <── │ Signer Private Key (4096-bit) │
-│ (Injects Randomized Salt) │ │ (Kept Secret / Protected 600) │
-└───────────────────────────────┘ └────────────────────────────────┘
-│
-▼
-┌───────────────────────────────┐
-│ RSA Encryption Math │
-└───────────────────────────────┘
-│
-▼
-[ 512-Byte Digital Signature ] ──> Written to disk as 'contract.txt.sig'
-
-
-========================================================================================
 PHASE B: VERIFICATION WORKFLOW
-========================================================================================
+[ Received Document ] ───────────> [ SHA-256 Engine ] ───────────> [ New Hash ]
+                                                                       │
+                                                                 (Match Check)
+                                                                       │
+[ Received Signature ] ──> [ RSA Verification Engine ] ──> [ Decrypted Hash ]
+                                  ▲
+                                  │
+                       [ Signer Public Key ]
 
-[ Received Document File ] [ Received Signature (.sig) ] [ Signer Public Key ]
-│ │ │
-▼ ▼ ▼
-┌──────────────────────┐ ┌────────────────────────────────────────────────┐
-│ Recompute SHA-256 │ │ RSA Verification Engine │
-│ New Hash Digest │ │ (Decrypts signature & removes PSS salt) │
-└──────────────────────┘ └────────────────────────────────────────────────┘
-│ │
-▼ ▼
-[ New Hash ] [ Decrypted Hash ]
-│ │
-└───────────────► ┌──────────────┐ ◄─────────────┘
-│ Match Check │
-└──────────────┘
-│
-┌──────────────────┴──────────────────┐
-▼ ▼
-【 MATCHES SECURELY 】 【 DOES NOT MATCH 】
-- Verification Success - Verification Critical Failure
-- Integrity Intact - Document Altered!
-- Non-Repudiation Enforced - Forgery/Tamper Detected!
-========================================================================================
-
-
----
 
 ## 3. Technology Stack
 
@@ -92,7 +58,6 @@ PHASE B: VERIFICATION WORKFLOW
 * **Environment**: Isolated Local Virtual Environments (`venv`)
 * **Target OS Deployments**: Production-ready for Linux Enterprise Distributions (RHEL, Ubuntu Server)
 
----
 
 ## 4. Setup and Installation
 
@@ -112,7 +77,6 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
----
 
 ## 5. Usage Instructions
 
@@ -138,7 +102,6 @@ To run an independent security check against a file and its signature:
 python3 truth_tracker.py verify -f contract.txt -s contract.txt.sig -k public_key.pem
 ```
 
----
 
 ## 6. Security Testing & Tamper Detection Procedures
 
@@ -164,7 +127,6 @@ python3 truth_tracker.py verify -f contract.txt -s contract.txt.sig -k public_ke
 [-] Security Warning: The file has been modified, or the signature was forged.
 ```
 
----
 
 ## 7. Lessons Learned & Future Architectural Enhancements
 
