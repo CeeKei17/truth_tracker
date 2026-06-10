@@ -25,14 +25,62 @@ The application relies on strong, industry-standard cryptographic primitives dec
 
 ### System Workflow Block Diagram
 
-```text
-[ Administrative Document ] ──> ( SHA-256 Hashing Engine ) ──> [ 32-Byte Digest ]
-│
-[ Signer Private Key (4096-bit) ] ──> ( RSA-PSS Encryption ) <───────┘
+========================================================================================
+PHASE A: SIGNING WORKFLOW
+========================================================================================
+
+[ Administrative Document ] ──> Reads bytes in 4KB blocks
 │
 ▼
-[ 512-Byte Binary Signature (.sig) ]
-```
+┌───────────────────────────────┐
+│ SHA-256 Hashing Engine │ ──> Mathematical One-Way Compression
+└───────────────────────────────┘
+│
+▼
+[ 32-Byte Hash Digest ]
+│
+▼
+┌───────────────────────────────┐ ┌────────────────────────────────┐
+│ RSA-PSS Padding Layer │ <── │ Signer Private Key (4096-bit) │
+│ (Injects Randomized Salt) │ │ (Kept Secret / Protected 600) │
+└───────────────────────────────┘ └────────────────────────────────┘
+│
+▼
+┌───────────────────────────────┐
+│ RSA Encryption Math │
+└───────────────────────────────┘
+│
+▼
+[ 512-Byte Digital Signature ] ──> Written to disk as 'contract.txt.sig'
+
+
+========================================================================================
+PHASE B: VERIFICATION WORKFLOW
+========================================================================================
+
+[ Received Document File ] [ Received Signature (.sig) ] [ Signer Public Key ]
+│ │ │
+▼ ▼ ▼
+┌──────────────────────┐ ┌────────────────────────────────────────────────┐
+│ Recompute SHA-256 │ │ RSA Verification Engine │
+│ New Hash Digest │ │ (Decrypts signature & removes PSS salt) │
+└──────────────────────┘ └────────────────────────────────────────────────┘
+│ │
+▼ ▼
+[ New Hash ] [ Decrypted Hash ]
+│ │
+└───────────────► ┌──────────────┐ ◄─────────────┘
+│ Match Check │
+└──────────────┘
+│
+┌──────────────────┴──────────────────┐
+▼ ▼
+【 MATCHES SECURELY 】 【 DOES NOT MATCH 】
+- Verification Success - Verification Critical Failure
+- Integrity Intact - Document Altered!
+- Non-Repudiation Enforced - Forgery/Tamper Detected!
+========================================================================================
+
 
 ---
 
