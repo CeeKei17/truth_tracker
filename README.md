@@ -25,36 +25,9 @@ The application relies on strong, industry-standard cryptographic primitives dec
 
 ### System Workflow Block Diagram
 
-###PHASE A: SIGNING WORKFLOW
+<img width="2300" height="3230" alt="image" src="https://github.com/user-attachments/assets/73801732-14f0-4c08-840b-d2534cbb0939" />
 
-
-[ Document ] ──(4KB Blocks)──> [ SHA-256 Engine ] ──> [ 32-Byte Hash ]
-                                                            │
-  ┌─────────────────────────────────────────────────────────┘
-  ▼
-[ RSA-PSS Padding ] ──(+ Randomized Salt)──> [ RSA Encryption ]
-                                                    ▲
-                                                    │
-                                      [ 4096-bit Private Key ]
-                                                    │
-                                                    ▼
-                                      [ 512-Byte Detached Signature ]
-                                      (Saved as 'contract.txt.sig')
-
-
-###PHASE B: VERIFICATION WORKFLOW
-
-
-[ Received Document ] ───────────> [ SHA-256 Engine ] ───────────> [ New Hash ]
-                                                                       │
-                                                                 (Match Check)
-                                                                       │
-[ Received Signature ] ──> [ RSA Verification Engine ] ──> [ Decrypted Hash ]
-                                  ▲
-                                  │
-                       [ Signer Public Key ]
-
-
+                                      
 
 ## 3. Technology Stack
 
