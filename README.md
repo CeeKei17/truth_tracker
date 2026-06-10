@@ -25,7 +25,9 @@ The application relies on strong, industry-standard cryptographic primitives dec
 
 ### System Workflow Block Diagram
 
-PHASE A: SIGNING WORKFLOW
+###PHASE A: SIGNING WORKFLOW
+
+
 [ Document ] ──(4KB Blocks)──> [ SHA-256 Engine ] ──> [ 32-Byte Hash ]
                                                             │
   ┌─────────────────────────────────────────────────────────┘
@@ -39,7 +41,10 @@ PHASE A: SIGNING WORKFLOW
                                       [ 512-Byte Detached Signature ]
                                       (Saved as 'contract.txt.sig')
 
-PHASE B: VERIFICATION WORKFLOW
+
+###PHASE B: VERIFICATION WORKFLOW
+
+
 [ Received Document ] ───────────> [ SHA-256 Engine ] ───────────> [ New Hash ]
                                                                        │
                                                                  (Match Check)
@@ -48,6 +53,7 @@ PHASE B: VERIFICATION WORKFLOW
                                   ▲
                                   │
                        [ Signer Public Key ]
+
 
 
 ## 3. Technology Stack
